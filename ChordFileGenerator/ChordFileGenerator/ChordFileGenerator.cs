@@ -31,7 +31,6 @@ namespace ChordFileGenerator
 
     public void SaveFile(string file)
     {
-            StringBuilder contents = new StringBuilder();
             string dir = Directory.GetCurrentDirectory();
             FileStream fs = new FileStream(dir + "\\" + file, FileMode.Create, FileAccess.Write);
             StreamWriter sr = new StreamWriter(fs);
@@ -61,11 +60,6 @@ namespace ChordFileGenerator
             fs.Close();
             Console.WriteLine("Saved successfully..!");
 
-        }
-
-        public void GetSongDetails()
-        {
-            Console.WriteLine("The Song details....!");
         }
 
     }
