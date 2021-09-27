@@ -12,7 +12,7 @@ namespace SongDeatails
         static void Main(string[] args)
         {
 
-            FileInfo file = new FileInfo(@"C:\Training\Assignment 2\ChordFileGenerator\ChordFileGenerator\bin\Debug\ChordFileGenerator.dll");
+            FileInfo file = new FileInfo(@"C:\Training\Assignment-2\ChordFileGenerator\ChordFileGenerator\bin\Debug\ChordFileGenerator.dll");
             Assembly assembly = Assembly.LoadFrom(file.FullName);
 
             Type type = assembly.GetType("ChordFileGenerator.ChordFileGenerator");
@@ -21,12 +21,13 @@ namespace SongDeatails
 
             Console.Write("Enter Song Name : ");
             string songName = Console.ReadLine();
-            SetProperty(obj, "SongName", songName);
+            PropertyInfo property = obj.GetType().GetProperty("SongName");
+            property.SetValue(obj, songName);
 
             Console.Write("Enter Artist of the entered Song : ");
             string artist = Console.ReadLine();
-
-            SetProperty(obj, "Artist", artist);
+            property = obj.GetType().GetProperty("Artist");
+            property.SetValue(obj, artist);
 
             Console.Write("Enter File Type : ");
             string fileType = Console.ReadLine();
@@ -34,59 +35,43 @@ namespace SongDeatails
             Type EnumTypes = assembly.GetType("ChordFileGenerator.FileType");
 
             object fileTypeValue = GetEnumValue(EnumTypes, fileType);
-            SetProperty(obj, "FileType", fileTypeValue);
+            property = obj.GetType().GetProperty("FileType");
+            property.SetValue(obj, fileTypeValue);
+            
 
-            string lineType;
+            int choice;
+            int ch = 1;
             do
             {
+                Console.Write("Choose Line Type option :\n1. Lyric(L) \n2. Chords and Lyric (CL) : ");
+                choice = Convert.ToInt32(Console.ReadLine());
 
-                Console.Write("Choose Line Type L or CL :\n1. Lyric(L) \n2. Chords and Lyric (CL) or blank to cancel: ");
-                lineType = Console.ReadLine();
-
-                if (lineType == "L")
-                { 
-                    string lyrics = Console.ReadLine();
-                    InvokeMethod(obj, "AddLine", new object[] { lyrics });
-                }
-                else if (lineType == "CL")
+                if (choice == 1)
                 {
+                    Console.WriteLine("Enter Lyrics : ");
+                    string lyrics = Console.ReadLine();
+                    MethodInfo addLine = type.GetMethod("SaveFile");
+                    addLine.Invoke(obj, new object[] { lyrics });
+                }
+                else if (choice == 2)
+                {
+                    Console.WriteLine("Enter Chords : ");
                     string chords = Console.ReadLine();
+
+                    Console.WriteLine("Enter Lyrics : ");
                     string lyrics = Console.ReadLine();
 
-                    InvokeMethod(obj, "AddLine", new object[] { chords, lyrics });
+                    MethodInfo addLine = type.GetMethod("SaveFile");
+                    addLine.Invoke(obj, new object[] { chords, lyrics });                 
                 }
-            } while (lineType == "L" || lineType == "CL");
+                Console.WriteLine("Do you want to continue ? Enter 1 to continue 0 to skip: ");
+                ch = Convert.ToInt32(Console.ReadLine());
+            } while (ch == 1);
 
-            InvokeMethod(obj, "SaveFile", new object[] { "test.txt" });
-
-            Console.WriteLine("Saved file!");
-
-            Console.WriteLine(assembly);
+            MethodInfo method = type.GetMethod("SaveFile");
+            method.Invoke(obj, new object[] { "test.txt" });
 
             Console.ReadLine();
-        }
-
-        public static object GetProperty(object obj, string propertyName)
-        {
-            PropertyInfo property = obj.GetType().GetProperty(propertyName);
-
-            return property.GetValue(obj);
-        }
-        public static void SetProperty(object obj, string Name, object value)
-        {
-
-            PropertyInfo property = obj.GetType().GetProperty(Name);
-
-            property.SetValue(obj, value);
-        }
-
-        public static object InvokeMethod(object obj, string methodName, object[] arguments)
-        {
-            Type[] types = arguments.Select(x => x.GetType()).ToArray();
-
-            MethodInfo method = obj.GetType().GetMethod(methodName, types);
-
-            return method.Invoke(obj, arguments);
         }
 
         public static object GetEnumValue(Type enumType, string enumItemName)

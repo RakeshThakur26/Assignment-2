@@ -28,42 +28,45 @@ namespace ChordFileGenerator
             lines.Add(lyrics);
         }
 
-        public void SaveFile(string fileName)
-        {
-            string Info = GenerateFileContents();
-            File.WriteAllText(fileName, Info);
-        }
 
-        private string GenerateFileContents()
-        {
+    public void SaveFile(string file)
+    {
             StringBuilder contents = new StringBuilder();
+            string dir = Directory.GetCurrentDirectory();
+            FileStream fs = new FileStream(dir + "\\" + file, FileMode.Create, FileAccess.Write);
+            StreamWriter sr = new StreamWriter(fs);
 
-            contents.AppendLine("Song Name: " + SongName);
-            contents.AppendLine("Artist: " + Artist);
+            sr.WriteLine("Song Name: " + SongName);
+            sr.WriteLine("Artist: " + Artist);
 
             switch (FileType)
             {
                 case FileType.Chords:
-                    contents.AppendLine("Type: Chords");
+                    sr.WriteLine("Type: Chords");
                     break;
                 case FileType.Tab:
-                    contents.AppendLine("Type: Tab");
+                    sr.WriteLine("Type: Tab");
                     break;
                 default:
-                    contents.AppendLine("Type: Lyrics");
+                    sr.WriteLine("Type: Lyrics");
                     break;
             }
-
-            contents.AppendLine("***************************************************");
-
-            foreach (string line in lines)
+            sr.WriteLine("Lyrics : ");
+            foreach (var item in lines)
             {
-                contents.AppendLine(line);
+                sr.WriteLine(item);
             }
+            sr.WriteLine("***************************************************");
+            sr.Close();
+            fs.Close();
+            Console.WriteLine("Saved successfully..!");
 
-            return contents.ToString();
         }
 
+        public void GetSongDetails()
+        {
+            Console.WriteLine("The Song details....!");
+        }
 
     }
 
